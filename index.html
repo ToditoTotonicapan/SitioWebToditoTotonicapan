@@ -70,14 +70,53 @@
       color: #333;
     }
 
+    /* Contenedor de búsqueda y filtros */
+    .search-filter-container {
+      max-width: 1200px;
+      margin: 0 auto 20px;
+      padding: 0 20px;
+    }
+
+    /* Buscador */
+    .search-box {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto 20px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px 20px;
+      padding-left: 45px;
+      border: 1px solid #ddd;
+      border-radius: 30px;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.3s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .search-input:focus {
+      border-color: #006AFF;
+      box-shadow: 0 2px 12px rgba(0,106,255,0.2);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #777;
+    }
+
     /* Filtros */
     .filters {
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
       gap: 10px;
-      margin-bottom: 20px;
-      padding: 0 20px;
+      padding: 10px 0;
     }
 
     .filter-btn {
@@ -87,12 +126,22 @@
       border-radius: 20px;
       cursor: pointer;
       transition: all 0.3s;
+      font-size: 14px;
     }
 
     .filter-btn:hover, .filter-btn.active {
       background: #006AFF;
       color: white;
       border-color: #006AFF;
+    }
+
+    /* Mensaje cuando no hay resultados */
+    .no-results {
+      text-align: center;
+      grid-column: 1 / -1;
+      padding: 40px 0;
+      color: #777;
+      font-size: 18px;
     }
 
     .grid-container {
@@ -293,14 +342,23 @@
   <!-- ===== Galería tipo tienda CUADRICULA-->
   <h2>Catálogo de Prendas</h2>
   
-  <!-- Filtros -->
-  <div class="filters" id="filters">
-    <button class="filter-btn active" data-filter="todos">Todos</button>
-    <button class="filter-btn" data-filter="camisas">Camisas</button>
-    <button class="filter-btn" data-filter="vestidos">Vestidos</button>
-    <button class="filter-btn" data-filter="pantalones">Pantalones</button>
-    <button class="filter-btn" data-filter="zapatos">Zapatos</button>
-    <button class="filter-btn" data-filter="accesorios">Accesorios</button>
+  <!-- Contenedor de búsqueda y filtros -->
+  <div class="search-filter-container">
+    <!-- Buscador -->
+    <div class="search-box">
+      <i class="fas fa-search search-icon"></i>
+      <input type="text" class="search-input" id="searchInput" placeholder="Buscar prendas...">
+    </div>
+    
+    <!-- Filtros -->
+    <div class="filters" id="filters">
+      <button class="filter-btn active" data-filter="todos">Todos</button>
+      <button class="filter-btn" data-filter="camisas">Camisas</button>
+      <button class="filter-btn" data-filter="vestidos">Vestidos</button>
+      <button class="filter-btn" data-filter="pantalones">Pantalones</button>
+      <button class="filter-btn" data-filter="zapatos">Zapatos</button>
+      <button class="filter-btn" data-filter="accesorios">Accesorios</button>
+    </div>
   </div>
   
   <div class="grid-container" id="product-grid"></div>
@@ -360,11 +418,36 @@
     { imagen: "imagenes/img72.jpg", nombre: "Bolso de Cuero", precio: "$55.00", categoria: "accesorios" }
   ];
 
-  // Función para generar las tarjetas de producto con filtrado
-  function renderizarProductos(filtro = 'todos') {
+  // Variables globales
+  let currentFilter = 'todos';
+  let currentSearch = '';
+
+  // Función para filtrar productos
+  function filtrarProductos() {
+    return productos.filter(producto => {
+      const cumpleFiltro = currentFilter === 'todos' || producto.categoria === currentFilter;
+      const cumpleBusqueda = producto.nombre.toLowerCase().includes(currentSearch.toLowerCase());
+      return cumpleFiltro && cumpleBusqueda;
+    });
+  }
+
+  // Función para generar las tarjetas de producto
+  function renderizarProductos() {
     const contenedor = document.getElementById('product-grid');
     contenedor.innerHTML = '';
     
+    // Obtener productos filtrados
+    const productosFiltrados = filtrarProductos();
+    
+    // Mostrar mensaje si no hay resultados
+    if (productosFiltrados.length === 0) {
+      const noResults = document.createElement('div');
+      noResults.className = 'no-results';
+      noResults.textContent = 'No se encontraron productos que coincidan con tu búsqueda';
+      contenedor.appendChild(noResults);
+      return;
+    }
+
     // Obtener elementos del zoom
     const zoomOverlay = document.getElementById('zoomOverlay');
     const zoomedImg = document.getElementById('zoomedImg');
@@ -398,11 +481,6 @@
         closeZoomFunc();
       }
     });
-
-    // Filtrar productos según la categoría seleccionada
-    const productosFiltrados = filtro === 'todos' 
-      ? productos 
-      : productos.filter(producto => producto.categoria === filtro);
 
     // Generar cada tarjeta de producto
     productosFiltrados.forEach((producto, index) => {
@@ -442,11 +520,18 @@
         filterButtons.forEach(btn => btn.classList.remove('active'));
         // Añadir clase active al botón clickeado
         this.classList.add('active');
-        // Obtener el filtro seleccionado
-        const filtro = this.dataset.filter;
+        // Actualizar filtro actual
+        currentFilter = this.dataset.filter;
         // Renderizar productos con el filtro aplicado
-        renderizarProductos(filtro);
+        renderizarProductos();
       });
+    });
+    
+    // Configurar evento del buscador
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', function() {
+      currentSearch = this.value;
+      renderizarProductos();
     });
     
     // Slider grande
