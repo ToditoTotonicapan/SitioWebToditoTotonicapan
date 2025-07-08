@@ -85,6 +85,8 @@
       overflow: hidden;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       transition: transform 0.3s;
+      display: flex;
+      flex-direction: column;
     }
 
     .card:hover {
@@ -100,6 +102,9 @@
     .card .info {
       padding: 10px;
       text-align: center;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
     }
 
     .card .info h3 {
@@ -110,15 +115,40 @@
     .card .info p {
       color: #555;
       font-size: 0.9em;
+      margin: 5px 0;
+    }
+
+    /* Estilos para el botón de Messenger */
+    .messenger-btn {
+      display: inline-block;
+      padding: 8px 15px;
+      margin-top: 10px;
+      background-color: #006AFF;
+      color: white;
+      text-decoration: none;
+      border-radius: 20px;
+      font-size: 0.9em;
+      transition: background-color 0.3s;
+      align-self: center;
+      margin-bottom: 10px;
+    }
+
+    .messenger-btn:hover {
+      background-color: #0055CC;
+    }
+
+    .messenger-btn i {
+      margin-right: 5px;
     }
   </style>
+  <!-- Iconos de Font Awesome para el ícono de Messenger -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 
   <!-- ===== Slider principal (grande) ===== -->
   <div class="slider">
-    
-    <img src="imagenes/img1.jpg"alt="Destacado 1" class="active">
+    <img src="imagenes/img1.jpg" alt="Destacado 1" class="active">
     <img src="imagenes/img2.jpg" alt="Destacado 2">
     <img src="imagenes/img3.jpg" alt="Destacado 3">
     <img src="imagenes/img4.jpg" alt="Destacado 4">
@@ -156,9 +186,9 @@
     </div>
   </div>
 
-  <!-- ===== Galería tipo tienda ===== JOJOJOJOJOJOJOJO-->
+  <!-- ===== Galería tipo tienda CUADRICULA-->
   <h2>Catálogo de Prendas</h2>
-<div class="grid-container" id="product-grid"></div>
+  <div class="grid-container" id="product-grid"></div>
 
 <script>
   // Datos de los productos (pueden venir de una base de datos o API)
@@ -167,7 +197,6 @@
     { imagen: "imagenes/img32.jpg", nombre: "Vestido Floral", precio: "$25.00" },
     { imagen: "imagenes/img33.jpg", nombre: "Jeans Azul", precio: "$18.00" },
     { imagen: "imagenes/img34.jpg", nombre: "Chaqueta Negra", precio: "$35.00" },
-    // Puedes agregar más productos aquí
     { imagen: "imagenes/img35.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
     { imagen: "imagenes/img36.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
     { imagen: "imagenes/img37.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
@@ -224,6 +253,9 @@
         <div class="info">
           <h3>${producto.nombre}</h3>
           <p>${producto.precio}</p>
+          <a href="https://m.me/tuperfil" class="messenger-btn" target="_blank">
+            <i class="fab fa-facebook-messenger"></i> Consultar
+          </a>
         </div>
       `;
       contenedor.appendChild(card);
@@ -233,8 +265,6 @@
   // Ejecutar al cargar la página
   document.addEventListener('DOMContentLoaded', renderizarProductos);
 </script>
-    <!-- Puedes agregar más productos aquí JOJOJOJOJOJOJOJOJ -->
-  </div>
 
   <!-- ===== JavaScript para el slider grande ===== -->
   <script>
