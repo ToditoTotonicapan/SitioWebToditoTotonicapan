@@ -283,6 +283,71 @@
       overflow: hidden;
     }
 
+    /* Nuevos estilos para el botón de compra y productos no disponibles */
+    .buy-btn {
+      display: inline-block;
+      padding: 8px 15px;
+      margin-top: 5px;
+      background-color: #28a745;
+      color: white;
+      text-decoration: none;
+      border-radius: 20px;
+      font-size: 0.9em;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      align-self: center;
+      margin-bottom: 10px;
+    }
+
+    .buy-btn:hover {
+      background-color: #218838;
+    }
+
+    .buy-btn i {
+      margin-right: 5px;
+    }
+
+    .card.disabled {
+      position: relative;
+      opacity: 0.7;
+    }
+
+    .card.disabled::after {
+      content: "AGOTADO";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(255, 0, 0, 0.8);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-weight: bold;
+      font-size: 1.2em;
+      z-index: 2;
+    }
+
+    .card.disabled img {
+      filter: grayscale(100%);
+    }
+
+    .card.disabled .info {
+      position: relative;
+      z-index: 1;
+    }
+
+    .card.disabled .buy-btn,
+    .card.disabled .messenger-btn {
+      display: none;
+    }
+
+    .sold-out-text {
+      color: red;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
     @media (max-width: 768px) {
       .filters {
         justify-content: flex-start;
@@ -482,28 +547,64 @@
       }
     });
 
+    // Obtener productos no disponibles del localStorage
+    const productosNoDisponibles = JSON.parse(localStorage.getItem('productosNoDisponibles')) || [];
+
     // Generar cada tarjeta de producto
     productosFiltrados.forEach((producto, index) => {
       const card = document.createElement('div');
-      card.className = 'card';
+      const noDisponible = productosNoDisponibles.includes(producto.nombre);
+      
+      card.className = noDisponible ? 'card disabled' : 'card';
+      
       card.innerHTML = `
         <img src="${producto.imagen}" alt="${producto.nombre || 'Producto ' + (index + 1)}">
         <div class="info">
           <h3>${producto.nombre}</h3>
           <p>${producto.precio}</p>
-          <a href="https://m.me/ToditoTotonicapanVentaDeRopaYAlgoMas?text=Estoy%20interesado%20en%20${encodeURIComponent(producto.nombre)}" class="messenger-btn" target="_blank">
-            <i class="fab fa-facebook-messenger"></i> Consultar
-          </a>
+          ${noDisponible ? 
+            '<p class="sold-out-text">AGOTADO</p>' : 
+            `<a href="https://m.me/ToditoTotonicapanVentaDeRopaYAlgoMas?text=Estoy%20interesado%20en%20${encodeURIComponent(producto.nombre)}" 
+               class="messenger-btn" target="_blank">
+              <i class="fab fa-facebook-messenger"></i> Consultar
+            </a>
+            <button class="buy-btn" data-product="${producto.nombre}">
+              <i class="fas fa-shopping-cart"></i> Comprar
+            </button>`
+          }
         </div>
       `;
+      
       contenedor.appendChild(card);
       
-      // Agregar evento de clic a la imagen para el zoom
-      const img = card.querySelector('img');
-      img.addEventListener('click', function(e) {
-        e.preventDefault();
-        openZoom(this.src, this.alt);
-      });
+      // Agregar evento de clic a la imagen para el zoom (solo si está disponible)
+      if (!noDisponible) {
+        const img = card.querySelector('img');
+        img.addEventListener('click', function(e) {
+          e.preventDefault();
+          openZoom(this.src, this.alt);
+        });
+      }
+      
+      // Agregar evento al botón de compra (solo si está disponible)
+      if (!noDisponible) {
+        const buyBtn = card.querySelector('.buy-btn');
+        buyBtn.addEventListener('click', function() {
+          const productName = this.getAttribute('data-product');
+          
+          // Confirmar la compra
+          if (confirm(`¿Confirmas la compra de "${productName}"?`)) {
+            // Agregar a la lista de no disponibles
+            if (!productosNoDisponibles.includes(productName)) {
+              productosNoDisponibles.push(productName);
+              localStorage.setItem('productosNoDisponibles', JSON.stringify(productosNoDisponibles));
+              
+              // Volver a renderizar los productos
+              renderizarProductos();
+            }
+          }
+        });
+      }
     });
   }
 
