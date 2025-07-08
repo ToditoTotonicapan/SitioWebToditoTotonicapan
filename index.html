@@ -70,6 +70,31 @@
       color: #333;
     }
 
+    /* Filtros */
+    .filters {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding: 0 20px;
+    }
+
+    .filter-btn {
+      padding: 8px 16px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      background: #006AFF;
+      color: white;
+      border-color: #006AFF;
+    }
+
     .grid-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -208,6 +233,18 @@
     body.zoom-active {
       overflow: hidden;
     }
+
+    @media (max-width: 768px) {
+      .filters {
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 10px;
+      }
+      
+      .filter-btn {
+        white-space: nowrap;
+      }
+    }
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
@@ -255,6 +292,17 @@
 
   <!-- ===== Galería tipo tienda CUADRICULA-->
   <h2>Catálogo de Prendas</h2>
+  
+  <!-- Filtros -->
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-filter="todos">Todos</button>
+    <button class="filter-btn" data-filter="camisas">Camisas</button>
+    <button class="filter-btn" data-filter="vestidos">Vestidos</button>
+    <button class="filter-btn" data-filter="pantalones">Pantalones</button>
+    <button class="filter-btn" data-filter="zapatos">Zapatos</button>
+    <button class="filter-btn" data-filter="accesorios">Accesorios</button>
+  </div>
+  
   <div class="grid-container" id="product-grid"></div>
 
   <!-- Overlay para el zoom -->
@@ -266,54 +314,54 @@
   </div>
 
 <script>
-  // Datos de los productos
+  // Datos de los productos con categorías añadidas
   const productos = [
-    { imagen: "imagenes/img31.jpg", nombre: "Camisa Blanca", precio: "$12.00" },
-    { imagen: "imagenes/img32.jpg", nombre: "Vestido Floral", precio: "$25.00" },
-    { imagen: "imagenes/img33.jpg", nombre: "Jeans Azul", precio: "$18.00" },
-    { imagen: "imagenes/img34.jpg", nombre: "Chaqueta Negra", precio: "$35.00" },
-    { imagen: "imagenes/img35.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img36.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img37.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img38.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img39.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img40.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img41.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img42.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img43.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img44.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img45.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img46.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img47.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img48.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img49.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img50.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img51.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img52.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img53.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img54.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img55.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img56.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img57.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img58.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img59.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img60.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img61.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img62.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img63.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img64.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img65.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img66.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img67.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img68.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img69.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img70.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img71.jpg", nombre: "Zapatos Casuales", precio: "$45.00" },
-    { imagen: "imagenes/img72.jpg", nombre: "Bolso de Cuero", precio: "$55.00" }
+    { imagen: "imagenes/img31.jpg", nombre: "Camisa Blanca", precio: "$12.00", categoria: "camisas" },
+    { imagen: "imagenes/img32.jpg", nombre: "Vestido Floral", precio: "$25.00", categoria: "vestidos" },
+    { imagen: "imagenes/img33.jpg", nombre: "Jeans Azul", precio: "$18.00", categoria: "pantalones" },
+    { imagen: "imagenes/img34.jpg", nombre: "Chaqueta Negra", precio: "$35.00", categoria: "abrigos" },
+    { imagen: "imagenes/img35.jpg", nombre: "Zapatos Casuales", precio: "$45.00", categoria: "zapatos" },
+    { imagen: "imagenes/img36.jpg", nombre: "Zapatos Deportivos", precio: "$45.00", categoria: "zapatos" },
+    { imagen: "imagenes/img37.jpg", nombre: "Zapatos Formales", precio: "$45.00", categoria: "zapatos" },
+    { imagen: "imagenes/img38.jpg", nombre: "Camisa Rayada", precio: "$45.00", categoria: "camisas" },
+    { imagen: "imagenes/img39.jpg", nombre: "Vestido de Noche", precio: "$45.00", categoria: "vestidos" },
+    { imagen: "imagenes/img40.jpg", nombre: "Pantalón Negro", precio: "$45.00", categoria: "pantalones" },
+    { imagen: "imagenes/img41.jpg", nombre: "Blusa Azul", precio: "$45.00", categoria: "camisas" },
+    { imagen: "imagenes/img42.jpg", nombre: "Falda Corta", precio: "$45.00", categoria: "faldas" },
+    { imagen: "imagenes/img43.jpg", nombre: "Zapatillas Deportivas", precio: "$45.00", categoria: "zapatos" },
+    { imagen: "imagenes/img44.jpg", nombre: "Sudadera con Capucha", precio: "$45.00", categoria: "abrigos" },
+    { imagen: "imagenes/img45.jpg", nombre: "Camiseta Básica", precio: "$45.00", categoria: "camisas" },
+    { imagen: "imagenes/img46.jpg", nombre: "Vestido de Verano", precio: "$45.00", categoria: "vestidos" },
+    { imagen: "imagenes/img47.jpg", nombre: "Jeans Rotos", precio: "$45.00", categoria: "pantalones" },
+    { imagen: "imagenes/img48.jpg", nombre: "Botas de Cuero", precio: "$45.00", categoria: "zapatos" },
+    { imagen: "imagenes/img49.jpg", nombre: "Chaleco Acolchado", precio: "$45.00", categoria: "abrigos" },
+    { imagen: "imagenes/img50.jpg", nombre: "Camisa de Lino", precio: "$45.00", categoria: "camisas" },
+    { imagen: "imagenes/img51.jpg", nombre: "Vestido Elegante", precio: "$45.00", categoria: "vestidos" },
+    { imagen: "imagenes/img52.jpg", nombre: "Pantalón de Vestir", precio: "$45.00", categoria: "pantalones" },
+    { imagen: "imagenes/img53.jpg", nombre: "Zapatos de Tacón", precio: "$45.00", categoria: "zapatos" },
+    { imagen: "imagenes/img54.jpg", nombre: "Abrigo Largo", precio: "$45.00", categoria: "abrigos" },
+    { imagen: "imagenes/img55.jpg", nombre: "Camisa a Cuadros", precio: "$45.00", categoria: "camisas" },
+    { imagen: "imagenes/img56.jpg", nombre: "Vestido Corto", precio: "$45.00", categoria: "vestidos" },
+    { imagen: "imagenes/img57.jpg", nombre: "Pantalón Cargo", precio: "$45.00", categoria: "pantalones" },
+    { imagen: "imagenes/img58.jpg", nombre: "Sandalias", precio: "$45.00", categoria: "zapatos" },
+    { imagen: "imagenes/img59.jpg", nombre: "Chaqueta de Cuero", precio: "$45.00", categoria: "abrigos" },
+    { imagen: "imagenes/img60.jpg", nombre: "Camisa Manga Larga", precio: "$45.00", categoria: "camisas" },
+    { imagen: "imagenes/img61.jpg", nombre: "Vestido Largo", precio: "$45.00", categoria: "vestidos" },
+    { imagen: "imagenes/img62.jpg", nombre: "Pantalón Deportivo", precio: "$45.00", categoria: "pantalones" },
+    { imagen: "imagenes/img63.jpg", nombre: "Zapatos Oxford", precio: "$45.00", categoria: "zapatos" },
+    { imagen: "imagenes/img64.jpg", nombre: "Parka Impermeable", precio: "$45.00", categoria: "abrigos" },
+    { imagen: "imagenes/img65.jpg", nombre: "Camisa de Seda", precio: "$45.00", categoria: "camisas" },
+    { imagen: "imagenes/img66.jpg", nombre: "Vestido de Fiesta", precio: "$45.00", categoria: "vestidos" },
+    { imagen: "imagenes/img67.jpg", nombre: "Pantalón Chino", precio: "$45.00", categoria: "pantalones" },
+    { imagen: "imagenes/img68.jpg", nombre: "Mocasines", precio: "$45.00", categoria: "zapatos" },
+    { imagen: "imagenes/img69.jpg", nombre: "Gabardina", precio: "$45.00", categoria: "abrigos" },
+    { imagen: "imagenes/img70.jpg", nombre: "Camisa de Algodón", precio: "$45.00", categoria: "camisas" },
+    { imagen: "imagenes/img71.jpg", nombre: "Vestido de Novia", precio: "$45.00", categoria: "vestidos" },
+    { imagen: "imagenes/img72.jpg", nombre: "Bolso de Cuero", precio: "$55.00", categoria: "accesorios" }
   ];
 
-  // Función para generar las tarjetas de producto
-  function renderizarProductos() {
+  // Función para generar las tarjetas de producto con filtrado
+  function renderizarProductos(filtro = 'todos') {
     const contenedor = document.getElementById('product-grid');
     contenedor.innerHTML = '';
     
@@ -351,8 +399,13 @@
       }
     });
 
+    // Filtrar productos según la categoría seleccionada
+    const productosFiltrados = filtro === 'todos' 
+      ? productos 
+      : productos.filter(producto => producto.categoria === filtro);
+
     // Generar cada tarjeta de producto
-    productos.forEach((producto, index) => {
+    productosFiltrados.forEach((producto, index) => {
       const card = document.createElement('div');
       card.className = 'card';
       card.innerHTML = `
@@ -378,7 +431,23 @@
 
   // Ejecutar al cargar la página
   document.addEventListener('DOMContentLoaded', function() {
+    // Renderizar todos los productos inicialmente
     renderizarProductos();
+    
+    // Configurar eventos de los filtros
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    filterButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        // Remover clase active de todos los botones
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        // Añadir clase active al botón clickeado
+        this.classList.add('active');
+        // Obtener el filtro seleccionado
+        const filtro = this.dataset.filter;
+        // Renderizar productos con el filtro aplicado
+        renderizarProductos(filtro);
+      });
+    });
     
     // Slider grande
     let current = 0;
